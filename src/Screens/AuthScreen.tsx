@@ -136,7 +136,7 @@ const AuthScreen: FC<AuthScreenProps> = ({navigation}) => {
                 style={styles.forgotButton}
                 onPress={handleForgotPassword}
             >
-                <Text style={styles.forgotButtonText}>Забув пароль</Text>
+                <Text style={styles.forgotButtonText}>Не пам'ятаю пароль</Text>
             </TouchableOpacity>
             <TouchableOpacity
                 style={[styles.button, loading && styles.buttonDisabled]}
@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
     },
     button: {
         backgroundColor: theme.colors.primary,
-        padding: theme.spacing.medium,
+        padding: theme.spacing.small,
         borderRadius: 8,
         alignItems: 'center',
         marginBottom: theme.spacing.medium,
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     forgotButtonText: {
-        color: '#201b1b',
+        color: theme.colors.primary,
         fontSize: 16,
         fontWeight: 'bold',
     },
