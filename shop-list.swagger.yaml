@@ -1,0 +1,1066 @@
+openapi: 3.0.0
+# Shop List API Documentation
+# This document describes the API for managing user accounts, authentication, and purchase lists.
+# It includes endpoints for user management, authentication, and CRUD operations on purchase lists.
+info:
+  title: shop77
+  version: 1.0.0
+  description: Shop lists API
+servers:
+- url: http://192.168.0.108:3005/api
+  description: Local development server
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: 'JWT token used for authenticating requests. Example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+  schemas:
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: 67a6483cb40aa919bb02a967
+        name:
+          type: string
+          example: user123
+        email:
+          type: string
+          example: user@example.com
+        phone:
+          type: string
+          example: '+380123456789'
+        isVerified:
+          type: boolean
+          example: false
+        isGoogleAuth:
+          type: boolean
+          example: false
+        purchaseLists:
+          type: object
+          properties:
+            myLists:
+              type: array
+              items:
+                type: string
+              example:
+              - 6795634b37631dd54570f0ca
+            sharedLists:
+              type: array
+              items:
+                type: string
+              example:
+              - 67a6483cb40aa919bb02a968
+        friends:
+          type: array
+          items:
+            type: string
+          example:
+          - 66f4009acb445514a69e1b34
+        createdAt:
+          type: string
+          format: date-time
+          example: '2023-01-01T00:00:00Z'
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2023-01-02T12:00:00Z'
+      required:
+      - _id
+      - name
+      - email
+      - isVerified
+      - isGoogleAuth
+    PurchaseItem:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: 679879b5a74bed340579edcb
+        name:
+          type: string
+          example: lemon
+        isCompleted:
+          type: boolean
+          example: false
+        addedBy:
+          type: string
+          example: 67a6483cb40aa919bb02a967
+      required:
+      - _id
+      - name
+      - addedBy
+    PurchaseList:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: 6795634b37631dd54570f0ca
+        title:
+          type: string
+          example: My new list
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PurchaseItem'
+        reactId:
+          type: string
+          example: some-react-id
+        createdAt:
+          type: string
+          format: date-time
+          example: '2023-01-01T00:00:00Z'
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2023-01-02T12:00:00Z'
+        user:
+          type: string
+          example: 67a6483cb40aa919bb02a967
+        sharedWith:
+          type: array
+          items:
+            type: string
+          example:
+          - 66f4009acb445514a69e1b34
+      required:
+      - _id
+      - title
+      - items
+      - user
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Something went wrong
+security:
+- bearerAuth: []
+tags:
+- name: users
+- name: auth
+- name: purchase
+paths:
+  /users:
+    get:
+      tags:
+      - users
+      summary: Get all users
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: List of all users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /users/{userId}:
+    get:
+      tags:
+      - users
+      summary: Get user by userId
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: userId
+        in: path
+        schema:
+          type: string
+        required: true
+        example: 67a6483cb40aa919bb02a967
+      responses:
+        '200':
+          description: User data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /users/me:
+    get:
+      tags:
+      - users
+      summary: Get current user
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Current user data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+      - users
+      summary: Delete current user
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: User deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User deleted
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      tags:
+      - users
+      summary: Update current user
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: max555
+                email:
+                  type: string
+                  example: max55@gmail.com
+                phone:
+                  type: string
+                  example: '+380123456789'
+      responses:
+        '200':
+          description: Updated user data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /users/friends:
+    get:
+      tags:
+      - users
+      summary: Get all friends of the current user
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: List of friends
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /users/friends/add/{friendId}:
+    post:
+      tags:
+      - users
+      summary: Add friend
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: friendId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ID of the friend to add
+      responses:
+        '200':
+          description: Friend added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /users/friends/delete/{friendId}:
+    delete:
+      tags:
+      - users
+      summary: Delete user from friends
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: friendId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ID of the friend to delete
+      responses:
+        '200':
+          description: Friend removed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /auth/verify:
+    get:
+      tags:
+      - auth
+      summary: Verify email
+      parameters:
+      - in: query
+        name: token
+        schema:
+          type: string
+        required: true
+        description: Verification token
+      responses:
+        '200':
+          description: Email verified
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Email verified
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /auth/set-password:
+    post:
+      tags:
+      - auth
+      summary: Set or update user password
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  example: P@$$word1
+              required:
+              - password
+      responses:
+        '200':
+          description: Password updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /auth/google:
+    post:
+      tags:
+      - auth
+      summary: Google sign in
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                  example: google_id_token
+              required:
+              - token
+      responses:
+        '200':
+          description: Google sign in success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                  refreshToken:
+                    type: string
+                  user:
+                    $ref: '#/components/schemas/User'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /auth/sign-up:
+    post:
+      tags:
+      - auth
+      summary: Sign up a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: max6
+                email:
+                  type: string
+                  example: max6@gmail.com
+                password:
+                  type: string
+                  example: P@$$word1
+                phone:
+                  type: string
+                  example: '+380123456789'
+              required:
+              - name
+              - email
+              - password
+      responses:
+        '200':
+          description: User registered
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                  refreshToken:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                  user:
+                    $ref: '#/components/schemas/User'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /auth/sign-in:
+    post:
+      tags:
+      - auth
+      summary: Sign in to the application
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: user@gmail.com
+                password:
+                  type: string
+                  example: P@$$$word1
+              required:
+              - email
+              - password
+      responses:
+        '200':
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                  refreshToken:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                  user:
+                    $ref: '#/components/schemas/User'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /auth/refresh:
+    post:
+      tags:
+      - auth
+      summary: Refresh access token
+      parameters:
+      - in: header
+        name: Authorization
+        schema:
+          type: string
+          example: Bearer <refreshToken>
+        required: true
+      responses:
+        '200':
+          description: Tokens refreshed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                  refreshToken:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /auth/change-password:
+    post:
+      tags:
+      - auth
+      summary: Change password
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                oldPassword:
+                  type: string
+                  example: P@$$word1
+                newPassword:
+                  type: string
+                  example: P@$$word2
+              required:
+              - oldPassword
+              - newPassword
+      responses:
+        '200':
+          description: Password changed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Password updated
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /auth/forgot-password:
+    put:
+      tags:
+      - auth
+      summary: Reset forgotten password
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                oldPassword:
+                  type: string
+                  example: P@$$word1
+                newPassword:
+                  type: string
+                  example: P@$$word2
+              required:
+              - oldPassword
+              - newPassword
+      responses:
+        '200':
+          description: Password reset
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Password reset successfully
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /purchase-list:
+    post:
+      tags:
+      - purchase
+      summary: Create a new purchase list
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: My new list
+                items:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        example: lemon
+              required:
+              - title
+              - items
+      responses:
+        '200':
+          description: Created purchase list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseList'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    get:
+      tags:
+      - purchase
+      summary: Get all purchase lists of the current user
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: List of purchase lists
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PurchaseList'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /purchase-list/{purchaseListId}:
+    put:
+      tags:
+      - purchase
+      summary: Update purchase list
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: purchaseListId
+        in: path
+        schema:
+          type: string
+        required: true
+        example: 6795634b37631dd54570f0ca
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: My updated list
+                items:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        example: apple
+      responses:
+        '200':
+          description: Updated purchase list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseList'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: List not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+      - purchase
+      summary: Delete purchase list
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: purchaseListId
+        in: path
+        schema:
+          type: string
+        required: true
+        example: 6795634b37631dd54570f0ca
+      responses:
+        '200':
+          description: List deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Purchase list deleted
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: List not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /purchase-list/{purchaseListId}/share:
+    post:
+      tags:
+      - purchase
+      summary: Share purchase list with another user
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: purchaseListId
+        in: path
+        schema:
+          type: string
+        required: true
+        example: 6795634b37631dd54570f0ca
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+                  example: 66f4009acb445514a69e1b34
+              required:
+              - userId
+      responses:
+        '200':
+          description: List shared
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseList'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: List or user not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /purchase-list/{purchaseListId}/items:
+    post:
+      tags:
+      - purchase
+      summary: Add item to purchase list
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: purchaseListId
+        in: path
+        schema:
+          type: string
+        required: true
+        example: 6795634b37631dd54570f0ca
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                item:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      example: orange
+                  required:
+                  - name
+              required:
+              - item
+              example:
+                item:
+                  name: orange
+      responses:
+        '200':
+          description: Item added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseList'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: List not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /purchase-list/{purchaseListId}/items/{itemId}:
+    patch:
+      tags:
+      - purchase
+      summary: Update item in purchase list
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: purchaseListId
+        in: path
+        schema:
+          type: string
+        required: true
+        example: 6795634b37631dd54570f0ca
+      - name: itemId
+        in: path
+        schema:
+          type: string
+        required: true
+        example: 679879b5a74bed340579edcb
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: updated_item
+                isCompleted:
+                  type: boolean
+                  example: true
+      responses:
+        '200':
+          description: Item updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseList'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: List or item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+      - purchase
+      summary: Delete item from purchase list
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: purchaseListId
+        in: path
+        schema:
+          type: string
+        required: true
+        example: 6795634b37631dd54570f0ca
+      - name: itemId
+        in: path
+        schema:
+          type: string
+        required: true
+        example: 679879b5a74bed340579edcb
+      responses:
+        '200':
+          description: Item deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseList'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: List or item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
