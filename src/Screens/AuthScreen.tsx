@@ -152,7 +152,7 @@ const AuthScreen: FC<AuthScreenProps> = ({navigation}) => {
                 disabled={loading}
                 style={styles.googleButton}
             />
-            {error && <Text style={styles.error}>Помилка {error}</Text>}
+            {/* {error && <Text style={styles.error}>Помилка {error}</Text>} */}
         </View>
     );
 };
