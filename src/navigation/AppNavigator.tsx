@@ -2,15 +2,15 @@ import React, {FC} from 'react';
 import {NavigationContainer, NavigatorScreenParams} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import HomeScreen from '../Screens/HomeScreen';
-import AuthScreen from '../Screens/AuthScreen';
+import HomeScreen from '../screens/HomeScreen';
+import AuthScreen from '../screens/AuthScreen';
 import {navigationRef} from './RootNavigation';
-import {ProfileScreen} from "../Screens/ProfileScreen";
+import {ProfileScreen} from "../screens/ProfileScreen";
 import {Ionicons} from '@expo/vector-icons';
 import * as Linking from 'expo-linking';
 import {useAppSelector} from "../hooks/useAppSelector";
-import {ResetPasswordScreen} from "../Screens/ResetPasswordScreen";
-import ListScreen from '../Screens/ListScreen';
+import {ResetPasswordScreen} from "../screens/ResetPasswordScreen";
+import ListScreen from '../screens/ListScreen';
 
 export type HomeStackParamList = {
   Home: undefined;
@@ -41,7 +41,7 @@ const MainTabs = () => (
     <Tab.Navigator
         screenOptions={({route}) => ({
             headerShown: false,
-            tabBarIcon: ({focused, color, size}) => {
+            tabBarIcon: ({focused, size}) => {
                 if (route.name === 'Home') {
                     return (
                         <Ionicons
