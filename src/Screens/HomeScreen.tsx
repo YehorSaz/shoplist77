@@ -1,9 +1,9 @@
 import React, { FC } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootState } from '../store';
-import { HomeStackParamList, RootStackParamList } from '../navigation/AppNavigator';
+import { HomeStackParamList } from '../navigation/AppNavigator';
 import { theme } from '../theme';
 
 type HomeScreenNavigationProp = StackNavigationProp<HomeStackParamList, 'Home'>;
@@ -14,7 +14,7 @@ interface HomeScreenProps {
 
 const HomeScreen: FC<HomeScreenProps> = ({ navigation }) => {
 
-    const { lists, loading, error } = useSelector((state: RootState) => state.lists);
+    const { lists, loading } = useSelector((state: RootState) => state.lists);
 
 
     if (loading) return <Text>Завантаження...</Text>;
@@ -23,7 +23,7 @@ const HomeScreen: FC<HomeScreenProps> = ({ navigation }) => {
         <View style={styles.container}>
             <Text style={styles.title}>Мої списки покупок</Text>
             {lists.length === 0 ? (
-                <Text>Списків поки немає</Text>
+                <Text>Немає списків</Text>
             ) : (
                 lists.map((list) => (
                     <Text key={list._id} style={styles.listItem}>
@@ -34,7 +34,7 @@ const HomeScreen: FC<HomeScreenProps> = ({ navigation }) => {
             <TouchableOpacity onPress={() => navigation.navigate('ListDetail', { listId: 'some-list-id' })}>
                 <Text style={styles.link}>Переглянути деталі списку</Text>
             </TouchableOpacity>
-            
+
         </View>
     );
 };
