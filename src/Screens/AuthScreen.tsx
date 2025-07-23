@@ -58,7 +58,7 @@ const AuthScreen: FC<AuthScreenProps> = ({navigation}) => {
         try {
             await dispatch(login(form)).unwrap();
         } catch (err) {
-            Alert.alert('Помилка входу', error || 'Не вдалося увійти. Перевірте дані.');
+            Alert.alert('Помилка входу', 'Не вдалося увійти. Перевірте дані.');
         }
     };
 

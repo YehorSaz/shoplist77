@@ -1,14 +1,18 @@
-import React, {FC } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { FC } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootState } from '../store';
-import { RootStackParamList } from '../navigation/AppNavigator';
+import { HomeStackParamList, RootStackParamList } from '../navigation/AppNavigator';
 import { theme } from '../theme';
 
-type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Main'>;
+type HomeScreenNavigationProp = StackNavigationProp<HomeStackParamList, 'Home'>;
 
-const HomeScreen: FC = () => {
+interface HomeScreenProps {
+    navigation: HomeScreenNavigationProp;
+}
+
+const HomeScreen: FC<HomeScreenProps> = ({ navigation }) => {
 
     const { lists, loading, error } = useSelector((state: RootState) => state.lists);
 
@@ -27,6 +31,10 @@ const HomeScreen: FC = () => {
                     </Text>
                 ))
             )}
+            <TouchableOpacity onPress={() => navigation.navigate('ListDetail', { listId: 'some-list-id' })}>
+                <Text style={styles.link}>Переглянути деталі списку</Text>
+            </TouchableOpacity>
+            
         </View>
     );
 };
@@ -42,6 +50,9 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: theme.colors.text,
         marginBottom: theme.spacing.large,
+    },
+    link: {
+        color: theme.colors.primary,
     },
     listItem: {
         fontSize: 16,

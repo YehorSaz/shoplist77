@@ -1,5 +1,5 @@
 import React, {FC} from 'react';
-import {NavigationContainer} from '@react-navigation/native';
+import {NavigationContainer, NavigatorScreenParams} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import HomeScreen from '../screens/HomeScreen';
@@ -10,10 +10,16 @@ import {Ionicons} from '@expo/vector-icons';
 import * as Linking from 'expo-linking';
 import {useAppSelector} from "../hooks/useAppSelector";
 import {ResetPasswordScreen} from "../screens/ResetPasswordScreen";
+import ListScreen from '../screens/ListScreen';
+
+export type HomeStackParamList = {
+  Home: undefined;
+  ListDetail: { listId: string };
+};
 
 export type RootStackParamList = {
     Main: undefined;
-    ListDetail: { listId: string };
+    Home: NavigatorScreenParams<HomeStackParamList>;
     Auth: undefined;
     ResetPassword: undefined;
     TestLink: undefined;
@@ -21,6 +27,15 @@ export type RootStackParamList = {
 
 const Stack = createStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator();
+
+const HomeStack = createStackNavigator<HomeStackParamList>();
+
+const HomeStackScreen = () => (
+    <HomeStack.Navigator>
+        <HomeStack.Screen name="Home" component={HomeScreen} options={{headerShown: false}}/>
+        <HomeStack.Screen name="ListDetail" component={ListScreen} options={{headerShown: false}}/>
+    </HomeStack.Navigator>
+);
 
 const MainTabs = () => (
     <Tab.Navigator
@@ -47,7 +62,7 @@ const MainTabs = () => (
             },
         })}
     >
-        <Tab.Screen name="Home" component={HomeScreen} options={{headerShown: false}}/>
+        <Tab.Screen name="Home" component={HomeStackScreen} options={{headerShown: false}}/>
         <Tab.Screen name="Profile" component={ProfileScreen} options={{headerShown: false}}/>
     </Tab.Navigator>
 );
